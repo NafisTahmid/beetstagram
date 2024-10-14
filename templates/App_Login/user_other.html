@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title_block %}
+    {{user_other.user_profile.full_name}} (@{{user_other.username}})
+{% endblock  %}
+
+{% block css_block %}
+    .crop {
+        width: 400px;
+        height: 400px;
+        overflow: hidden;
+    }
+
+    .crop img {
+        width: 400px;
+        height: 300px;
+        {% comment %} margin: -75px 0px 0px 100px; {% endcomment %}
+    }
+
+    @media(max-width:576px) {
+        .crop {
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+        }
+    
+        .crop img {
+            width: 200px;
+            height: 150px;
+            {% comment %} margin: -75px 0px 0px 100px; {% endcomment %}
+        }
+    }
+{% endblock  %}
+
+{% block body_block %}
+    <div class="row">
+        <div class="col-sm-4">
+            {% if user_other.user_profile.profile_pic %}
+                <img src="/media/{{user_other.user_profile.profile_pic}}" class="img-fluid d-block rounded-circle" width="250px" height="250px" alt="{{user_other.username}}">
+            {% else %}
+                <img src="/media/avatar.jpg" class="img-fluid d-block rounded-circle" width="250px" height="250px" alt="{{user_other.username}}">
+            {% endif %}
+        </div>
+
+        <div class="col-sm-8">
+            <h3>@{{user_other.username}}</h3> &nbsp; 
+            {% if not already_followed %}
+                <a href="{% url 'App_Login:follow' username=user_other.username %}" class="btn btn-warning btn-sm">Follow</a>
+            {% else %}
+                <a href="{% url 'App_Login:unfollow' username=user_other.username %}" class="btn btn-warning btn-sm">Unfollow</a>
+            {% endif %}
+            <br>
+            <h4>{{user_other.post_author.count}} posts &nbsp; &nbsp; {{user_other.following.count}} followers &nbsp; &nbsp; {{user_other.follower.count}} followings</h4> 
+
+            <br>
+            <br>
+            <h4>{{user_other.user_profile.full_name}}</h4>
+            <p>{{user_other.user_profile.bio}}</p>
+        </div>
+    </div>
+    <hr/>
+    <br>
+    <br>
+    <div class="row justify-content-center align-items-center">
+        {% for post in user_other.post_author.all %}
+        <div class="col-md-4">
+            <div class="crop">
+                <a href="{% url 'App_Posts:post_details' pk=post.pk %}"><img src="/media/{{post.image}}" class="img-fluid mx-auto d-block" title="{{ post.caption }}"></a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock  %}

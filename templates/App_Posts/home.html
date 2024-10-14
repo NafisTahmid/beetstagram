@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title_block %}
+    Beetstagram | Share Moments
+{% endblock  %}
+{% load crispy_forms_tags %}
+{% block css_block %}
+    .post-card {
+        height: 100%;
+        width: 86%;
+        background-color: #FAFAFA;
+        border: 2px solid #FAFAFA;
+        margin: 20px 0;
+        border-radius: 5px;
+    }
+
+    @media(max-width:576px) {
+        .post-card {
+            width: 100%
+        }
+    }
+{% endblock  %}
+
+{% block body_block %}
+    {% if search %}
+        <div class="row justify-content-center align-items-center">
+            {% for user in result %}
+                <div class="col-sm-2">
+                    {% if user.user_profile.profile_pic %}
+                        <img src="/media/{{user.user_profile.profile_pic}}" class="img-fluid mx-auto d-block rounded-circle" width="50px" height="50px" alt="">
+                    {% else %}
+                        <img src="/media/avatar.jpg" class="img-fluid mx-auto d-block rounded-circle" width="50px" height="50px" alt="">
+                    {% endif %}
+                    <br>
+                    <br>
+                    <br>
+                </div>
+
+                <div class="col-sm-10">
+                    <p><a href="{% url 'App_Login:user' username=user.username%}">@{{user.username}}</a></p>
+                    <small>{{ user.user_profile.full_name }}</small>
+                    <br>
+                    <br>
+                    <br>
+                </div>
+              
+            {% endfor %}
+        </div>
+      
+    {% else %}
+    {% for post in posts %}
+        <div class="row justify-content-center align-items-center">
+            <div class="col-sm-7">
+                <div class="post-card">
+                    {% if post.author.user_profile.profile_pic %}
+                        <img src="/media/{{post.author.user_profile.profile_pic}}" class=" ms-3 mt-2 rounded-circle img-fluid  mx-auto" width="50px" height="50px" alt="">&nbsp; <a href="{% url 'App_Login:user' username=post.author.username %}" href="">{{post.author.username}}</a>
+                    {% else %}
+                        <img src="/media/{{post.author.user_profile.profile_pic}}" class="ms-3 mt-2 rounded-circle img-fluid  mx-auto" width="50px" height="50px" alt="">&nbsp; <a href="{% url 'App_Login:user' username=post.author.username %}" href="">{{post.author.username}}</a>
+                    {% endif %}
+        
+                        <p class="ms-5 mt-2">{{post.caption}}</p>
+                        <a href="{% url 'App_Posts:post_details' pk=post.pk %}"><img src="/media/{{post.image}}" class="img-fluid mx-auto d-block mb-5" width="500px" height="600px" alt=""></a>
+                        
+                        <div class="ms-5 pb-1">
+                            <small>{{post.liked_post.count}} likes | {{ post.post_comments.count }} comments</small>
+                            <br>
+                            <br>
+                            {% if post.pk not in liked_post_list %}
+                                <div class="d-flex">
+                                    <a class="pt-2" href="{% url 'App_Posts:like' pk=post.pk %}"><i class="fa-regular fa-heart fa-2xl" style="color: #ff4d4d;"></i></a>
+                                    &nbsp; &nbsp; 
+                                    <button type="button" class="btn btn-light mb-3" data-bs-toggle="modal" data-bs-target="#exampleModal{{ post.pk }}">
+                                        <i class="fa-regular fa-comment  fa-2xl"></i>
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="exampleModal{{ post.pk }}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form method="POST">
+                                                    {{ comment_form|crispy }}
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="post_id" value="{{post.pk}}">
+                                                    <button type="submit" class="btn btn-danger btn-sm">Post Comment</button>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="d-flex">
+                                    <a class="pt-2" href="{% url 'App_Posts:unlike' pk=post.pk %}"><i class="fa-solid fa-heart fa-2xl" style="color: #ff4d4d;"></i></a> &nbsp; &nbsp; 
+                                    <button type="button" class="btn btn-primary btn-light mb-3" data-bs-toggle="modal" data-bs-target="#exampleModal{{ post.pk }}">
+                                        <i class="fa-regular fa-comment fa-2xl"></i>
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="exampleModal{{ post.pk }}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form method="POST">
+                                                    {{ comment_form|crispy }}
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="post_id" value="{{post.pk}}">
+                                                    <button type="submit" class="btn btn-danger btn-sm">Post Comment</button>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div> 
+                            {% endif %}
+                        </div>
+
+                        {% comment %} Display comments {% endcomment %}
+                        <h6 class="fs-6 fw-bold ms-5">Comments:</h6>
+                    {% for comment in post.post_comments.all %}
+                        <a href="{% url 'App_Login:user' username=comment.user.username %}" class="ms-5">@{{ comment.user.username }}</a>
+                        <br>
+                        <small class="ms-5 py-2">{{ comment.comment }}</small>
+                        <br>
+                    {% empty %}
+                        <p class="ms-5 py-2">No comments yet.</p>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+      
+    {% endfor %}
+    {% endif %}
+{% endblock  %}

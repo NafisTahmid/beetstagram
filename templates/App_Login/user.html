@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title_block %}
+    {{user.user_profile.full_name}} (@{{user.username}})
+{% endblock  %}
+
+{% block css_block %}
+    .crop {
+        width: 400px;
+        height: 400px;
+        overflow: hidden;
+    }
+
+    .crop img {
+        width: 400px;
+        height: 300px;
+        {% comment %} margin: -75px 0px 0px 100px; {% endcomment %}
+    }
+
+    @media(max-width:576px) {
+        .crop {
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+        }
+    
+        .crop img {
+            width: 200px;
+            height: 150px;
+            margin: -75px 0px 0px 100px;
+        }
+    }
+{% endblock  %}
+
+{% block body_block %}
+
+    <div class="row">
+        <div class="col-sm-4">
+            {% if user.user_profile.profile_pic %}
+                <img src="/media/{{user.user_profile.profile_pic}}" class="img-fluid d-block rounded-circle" width="250px" height="250px" alt="{{user.username}}">
+            {% else %}
+                <img src="/media/avatar.jpg" class="img-fluid d-block rounded-circle" width="250px" height="250px" alt="{{user.username}}">
+            {% endif %}
+        </div>
+
+        <div class="col-sm-8">
+            <h3>@{{user.username}} &nbsp; <a href="{% url 'App_Login:edit_profile' %}" class="btn btn-light btn-sm">Edit Profile</a></h3>
+            <br>
+            <h4>{{user.post_author.count}} posts &nbsp; &nbsp; {{user.following.count}} followers &nbsp; &nbsp; {{user.follower.count}} followings</h4> 
+
+            <br>
+            <br>
+            <h4>{{user.user_profile.full_name}}</h4>
+            <p>{{user.user_profile.bio}}</p>
+        </div>
+    </div>
+    <hr/>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Post
+    </button>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form|crispy }}
+                    {% csrf_token %}
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger"  data-bs-dismiss="modal">Post Photo</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        {% comment %} <button type="button" class="btn btn-danger">Save changes</button> {% endcomment %}
+                    </div>
+                </form>
+            </div>
+          
+        </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="row justify-content-center align-items-center">
+            {% for post in user.post_author.all %}
+            <div class="col-md-4">
+                <div class="crop">
+                    <a href="{% url 'App_Posts:post_details' pk=post.pk %}"><img src="/media/{{post.image}}" class="img-fluid mx-auto d-block" title="{{ post.caption }}"></a>
+                </div>
+            </div>
+            {% endfor %}
+    </div>
+{% endblock  %}

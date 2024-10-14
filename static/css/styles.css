@@ -1,0 +1,23 @@
+* {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.signup-form {
+    width:500px;
+    border: 1px solid cyan;
+    padding:30px;
+}
+
+.crop {
+    width: 400px;
+    height: 400px;
+    overflow: hidden;
+}
+
+.crop img {
+    width: 400px;
+    height: 300px;
+    margin: -75px 0px 0px 100px;
+}

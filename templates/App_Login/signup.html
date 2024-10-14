@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title_block %}
+    Beetstagram | Signup
+{% endblock  %}
+
+{% block body_block %}
+    <h2 class="text-center pb-2">Sign up to connect with your Friends</h2>
+    <center>
+    <div class="signup-form">
+        <form method="POST">
+                {{ form|crispy }}
+                {% csrf_token %}
+                <button type="submit" class="btn btn-info btn-sm">Create Account</button>
+        </form>
+        <p class="pt-3">Already have an account? <a href="{% url 'App_Login:login' %}">Log In</a></p>
+            
+        </div>
+    </center>
+   
+{% endblock  %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title_block %}
+    Posted by @{{post.author.username}}
+{% endblock  %}
+
+{% block body_block %}
+    <div class="row justify-content-center align-items-center">
+
+        <div class="col-sm-9">
+            <img src="/media/{{post.image}}" class="img-fluid d-block" width="700px" height="800px" alt="">
+            {% if post.author == user%}
+            <div class="d-flex justify-content-start align-items-center my-3">
+                <a href="{% url 'App_Posts:edit_post' pk=post.pk %}" class="btn btn-warning btn-sm">Edit Post</a>
+                <a href="{% url 'App_Posts:delete_post' pk=post.pk %}" class="btn btn-danger btn-sm ms-2" onclick= "return confirm('Delete post?')">Delete Post</a>
+            </div>
+            {% endif %}
+            <p class="my-2">{{ post.caption }}</p>
+            <small>Uploaded at: {{post.upload_date}}</small>
+            <br>
+            <br>
+            <p>{{post.liked_post.count }} likes | {{post.post_comments.count}} comments</p>
+
+            <div class="d-flex">
+                {% if not already_liked %}
+                {% comment %} fa-regular fa-heart fa-2xl {% endcomment %}
+                <a  class="pt-2" href="{% url 'App_Posts:like' pk=post.pk %}"><i class="fa-regular fa-heart fa-2xl" style="color: #ff4d4d;"></i></a>
+                &nbsp; &nbsp;
+                <button type="button" class="btn btn-light mb-3" data-bs-toggle="modal" data-bs-target="#exampleModal{{ post.pk }}">
+                    <i class="fa-regular fa-comment  fa-2xl"></i>
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal{{ post.pk }}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST">
+                                {{ comment_form|crispy }}
+                                {% csrf_token %}
+                                <input type="hidden" name="post_id" value="{{post.pk}}">
+                                <button type="submit" class="btn btn-danger btn-sm">Post Comment</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                {% else %}
+                {% comment %} fa-solid fa-heart fa-2xl {% endcomment %}
+                <a  class="pt-2" href="{% url 'App_Posts:unlike' pk=post.pk %}"><i class="fa-solid fa-heart fa-2xl" style="color: #ff4d4d;"></i></a>
+                &nbsp; &nbsp;
+                <button type="button" class="btn btn-primary btn-light mb-3" data-bs-toggle="modal" data-bs-target="#exampleModal{{ post.pk }}">
+                    <i class="fa-regular fa-comment fa-2xl"></i>
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal{{ post.pk }}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST">
+                                {{ comment_form|crispy }}
+                                {% csrf_token %}
+                                <input type="hidden" name="post_id" value="{{post.pk}}">
+                                <button type="submit" class="btn btn-danger btn-sm">Post Comment</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <h4>Posted by <a href="{% url 'App_Login:user' username=post.author.username%}">@{{post.author.username}}</a></h4>
+            <p>{{post.caption}}</p>
+            {% for comment in post.post_comments.all %}
+            <small><a href="{% url 'App_Login:user' username=comment.user.username%}">@{{comment.user.username}}</a></small>
+            <br>
+            <p>{{comment.comment}}</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock  %}
